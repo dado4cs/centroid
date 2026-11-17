@@ -1,0 +1,37 @@
+# Manim outputs & caches
+media/
+*.mp4
+*.gif
+*.png
+
+# Python & uv
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+*.egg-info/
+
+# C/C++ compiled binaries
+a.out
+*.out
+*.o
+*.exe
+
+# Agent skills & local tooling
+.agents/
+skills-lock.json
+
+# Enunciado del curso (local)
+CS2023_Proyecto_de_Curso_2.pdf
+
+# IDEs & OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
