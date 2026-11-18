@@ -53,6 +53,7 @@ config.tex_template = _custom_tex_template
 def create_paper_stage(
     scene: Scene, header_text: str = r"\infty\;\text{cs2023}\cdot\text{utec}"
 ) -> VGroup:
+    config.tex_template = _custom_tex_template
     desk = FullScreenRectangle(
         fill_color=DESK_BG, fill_opacity=1.0, stroke_width=0)
     shadow = RoundedRectangle(
@@ -439,28 +440,35 @@ def play_scene_2_execution(scene: Scene):
     tree = TreeVisual(trace.n, trace.edges, positions, node_radius=0.28)
 
     status_card = RoundedRectangle(
-        width=4.5,
-        height=4.4,
+        width=4.85,
+        height=4.85,
         corner_radius=0.12,
         fill_color=CARD_BG,
         fill_opacity=1.0,
         stroke_color=CARD_BORDER,
         stroke_width=2.0,
-    ).move_to(np.array([4.15, -0.35, 0.0]))
+    ).move_to(np.array([4.05, -0.45, 0.0]))
 
     phase_title = Tex(
-        r"\textbf{Fase 1: DFS de tamaños}", color=INK_DARK, font_size=28
-    ).move_to(status_card.get_top() + 0.55 * DOWN)
+        r"\textbf{Fase 1: DFS de tamaños}", color=INK_DARK, font_size=26
+    ).move_to(status_card.get_top() + 0.45 * DOWN)
 
-    code_formula = MathTex(
-        r"\text{sizes}[u] = 1 + \sum \text{sizes}[v]",
-        color=INK_MUTED,
-        font_size=26,
-    ).next_to(phase_title, DOWN, buff=0.28)
+    dfs_pseudo_lines = [
+        r"\texttt{dfs(u):}",
+        r"\texttt{\ \ sizes[u] = 1}",
+        r"\texttt{\ \ for v in G[u]:}",
+        r"\texttt{\ \ \ \ if sizes[v] == -1:}",
+        r"\texttt{\ \ \ \ \ \ sizes[u] += dfs(v)}",
+        r"\texttt{\ \ return sizes[u]}",
+    ]
+    code_formula = VGroup(
+        *[Tex(line, color=INK_DARK, font_size=20) for line in dfs_pseudo_lines]
+    ).arrange(DOWN, aligned_edge=LEFT, buff=0.07)
+    code_formula.next_to(phase_title, DOWN, buff=0.25)
 
     step_status = Tex(
-        r"Enraizando en $u = 1$...", color=INK_DARK, font_size=25
-    ).next_to(code_formula, DOWN, buff=0.45)
+        r"Enraizando en $u = 1$...", color=INK_MUTED, font_size=22
+    ).move_to(status_card.get_bottom() + 0.95 * UP)
 
     scene.play(
         FadeIn(sec_title),
@@ -470,8 +478,9 @@ def play_scene_2_execution(scene: Scene):
         FadeIn(phase_title),
         Write(code_formula),
         FadeIn(step_status),
-        run_time=1.5,
+        run_time=1.8,
     )
+    scene.wait(2.6)
 
     badge_dirs = {
         1: DOWN + LEFT,
@@ -490,13 +499,13 @@ def play_scene_2_execution(scene: Scene):
         if ev.kind == "enter":
             scene.play(
                 tree.nodes[ev.u].recolor_anim(TOKEN_AMBER),
-                run_time=0.18,
+                run_time=0.22,
             )
         elif ev.kind == "edge" and ev.v is not None:
             edge_mob = tree.edges[(ev.u, ev.v)]
             scene.play(
                 edge_mob.animate.set_stroke(color=TOKEN_AMBER[0], width=5.5),
-                run_time=0.14,
+                run_time=0.16,
             )
         elif ev.kind == "size" and ev.size_u is not None:
             badge = tree.create_size_badge(
@@ -506,7 +515,7 @@ def play_scene_2_execution(scene: Scene):
             scene.play(
                 FadeIn(badge, scale=0.8),
                 tree.nodes[ev.u].recolor_anim(TOKEN_BLUE),
-                run_time=0.22,
+                run_time=0.26,
             )
 
     scene.play(
@@ -514,18 +523,28 @@ def play_scene_2_execution(scene: Scene):
             line.animate.set_stroke(color=EDGE_COLOR, width=4.0)
             for line in tree.edges_group
         ],
-        run_time=0.5,
+        run_time=0.6,
     )
-    scene.wait(0.8)
+    scene.wait(3.0)
 
     new_phase_title = Tex(
-        r"\textbf{Fase 2: Búsqueda del Centroide}", color=INK_DARK, font_size=26
+        r"\textbf{Fase 2: Búsqueda del Centroide}", color=INK_DARK, font_size=25
     ).move_to(phase_title.get_center())
-    new_code_formula = MathTex(
-        r"\text{Buscar hijo } v \text{ con } \text{sizes}[v] > 4",
-        color=TOKEN_RED[0],
-        font_size=26,
-    ).move_to(code_formula.get_center())
+
+    search_pseudo_lines = [
+        r"\texttt{u = 1, p = -1}",
+        r"\texttt{while True:}",
+        r"\texttt{\ \ next = -1}",
+        r"\texttt{\ \ for v in G[u]:}",
+        r"\texttt{\ \ \ \ if v != p and sizes[v] > n/2:}",
+        r"\texttt{\ \ \ \ \ \ next = v; break}",
+        r"\texttt{\ \ if next == -1: return u}",
+        r"\texttt{\ \ p = u; u = next}",
+    ]
+    new_code_formula = VGroup(
+        *[Tex(line, color=INK_DARK, font_size=18) for line in search_pseudo_lines]
+    ).arrange(DOWN, aligned_edge=LEFT, buff=0.06)
+    new_code_formula.next_to(new_phase_title, DOWN, buff=0.22)
 
     pointer = Triangle(
         fill_color=TOKEN_AMBER[0],
@@ -541,8 +560,9 @@ def play_scene_2_execution(scene: Scene):
         ReplacementTransform(phase_title, new_phase_title),
         ReplacementTransform(code_formula, new_code_formula),
         FadeIn(pointer, shift=0.15 * DOWN),
-        run_time=1.0,
+        run_time=1.2,
     )
+    scene.wait(1.8)
 
     final_comp_regions = VGroup()
     for step in trace.greedy_steps:
@@ -550,8 +570,9 @@ def play_scene_2_execution(scene: Scene):
         scene.play(
             pointer.animate.next_to(tree.nodes[u], UP, buff=0.14),
             tree.nodes[u].recolor_anim(TOKEN_AMBER),
-            run_time=0.55,
+            run_time=0.65,
         )
+        scene.wait(0.6)
 
         for v, sz_v, is_heavy in step.checked_children:
             cmp_symbol = ">" if is_heavy else r"\le"
@@ -573,10 +594,10 @@ def play_scene_2_execution(scene: Scene):
                     FadeIn(heavy_region),
                     *[tree.nodes[x].recolor_anim(TOKEN_RED)
                       for x in heavy_nodes],
-                    run_time=0.95,
+                    run_time=1.0,
                 )
                 step_status = msg
-                scene.wait(0.6)
+                scene.wait(1.8)
                 scene.play(
                     FadeOut(heavy_region),
                     *[
@@ -588,7 +609,7 @@ def play_scene_2_execution(scene: Scene):
                     tree.edges[(u, v)].animate.set_stroke(
                         color=TOKEN_AMBER[0], width=6.0
                     ),
-                    run_time=0.65,
+                    run_time=0.75,
                 )
             else:
                 scene.play(
@@ -596,9 +617,10 @@ def play_scene_2_execution(scene: Scene):
                     Indicate(
                         tree.size_badges[v], color=TOKEN_GREEN[0], scale_factor=1.2
                     ),
-                    run_time=0.65,
+                    run_time=0.75,
                 )
                 step_status = msg
+                scene.wait(0.8)
 
         if step.next_node == -1:
             found_msg = Tex(
@@ -613,8 +635,8 @@ def play_scene_2_execution(scene: Scene):
                 rf"\text{{Componentes: }} {', '.join(map(str, comp_sizes))} \le {
                     half_n}",
                 color=TOKEN_GREEN[0],
-                font_size=28,
-            ).next_to(found_msg, DOWN, buff=0.35)
+                font_size=26,
+            ).next_to(found_msg, DOWN, buff=0.22)
 
             scene.play(
                 ReplacementTransform(step_status, found_msg),
@@ -640,9 +662,9 @@ def play_scene_2_execution(scene: Scene):
                     *[FadeIn(reg, scale=0.96) for reg in final_comp_regions],
                     lag_ratio=0.12,
                 ),
-                run_time=1.1,
+                run_time=1.2,
             )
-            scene.wait(2.2)
+            scene.wait(4.2)
 
     scene.play(
         FadeOut(sec_title),
@@ -654,8 +676,9 @@ def play_scene_2_execution(scene: Scene):
         FadeOut(new_code_formula),
         FadeOut(step_status),
         FadeOut(pointer),
-        run_time=0.9,
+        run_time=1.0,
     )
+    scene.wait(0.6)
 
 
 # Caso borde: árbol estrella
@@ -702,8 +725,9 @@ def play_scene_3_star_edge_case(scene: Scene):
         FadeIn(info_card),
         FadeIn(card_heading),
         FadeIn(card_body),
-        run_time=1.4,
+        run_time=1.8,
     )
+    scene.wait(3.8)
 
     badges = VGroup()
     for node_id, sz in trace.sizes.items():
@@ -721,9 +745,9 @@ def play_scene_3_star_edge_case(scene: Scene):
 
     scene.play(
         LaggedStart(*[FadeIn(b, scale=0.85) for b in badges], lag_ratio=0.08),
-        run_time=1.1,
+        run_time=1.4,
     )
-    scene.wait(0.8)
+    scene.wait(3.2)
 
     step1_txt = MathTex(
         r"\text{Desde } 1:\; \text{sizes}[2] = 6 > 3 \;\Rightarrow\; \text{salta a } 2",
@@ -735,9 +759,9 @@ def play_scene_3_star_edge_case(scene: Scene):
         tree.nodes[1].recolor_anim(TOKEN_AMBER),
         Write(step1_txt),
         tree.nodes[2].recolor_anim(TOKEN_RED),
-        run_time=1.1,
+        run_time=1.3,
     )
-    scene.wait(0.7)
+    scene.wait(2.5)
 
     step2_txt = Tex(
         r"En $u = 2$: las $6$ hojas quedan con\\"
@@ -764,9 +788,9 @@ def play_scene_3_star_edge_case(scene: Scene):
         LaggedStart(
             *[FadeIn(reg, scale=0.92) for reg in star_comp_regions], lag_ratio=0.08
         ),
-        run_time=1.3,
+        run_time=1.5,
     )
-    scene.wait(2.2)
+    scene.wait(4.0)
 
     scene.play(
         FadeOut(sec_title),
@@ -778,8 +802,105 @@ def play_scene_3_star_edge_case(scene: Scene):
         FadeOut(card_body),
         FadeOut(step1_txt),
         FadeOut(step2_txt),
+        run_time=1.0,
+    )
+    scene.wait(0.5)
+
+
+# Caso borde mínimo: árbol de un solo nodo (n = 1)
+def play_scene_3b_single_node_edge_case(scene: Scene):
+    trace: CentroidTrace = find_centroid_with_trace(1, [], root=1)
+
+    sec_title = Tex(
+        r"\textbf{Caso Borde Mínimo: Un Solo Nodo} ($n = 1,\; \lfloor n/2 \rfloor = 0$)",
+        color=INK_DARK,
+        font_size=34,
+    ).to_edge(UP, buff=0.92)
+
+    positions = {1: np.array([-2.15, -0.45, 0.0])}
+    tree = TreeVisual(trace.n, trace.edges, positions, node_radius=0.38)
+
+    info_card = RoundedRectangle(
+        width=5.1,
+        height=4.1,
+        corner_radius=0.12,
+        fill_color=CARD_BG,
+        fill_opacity=1.0,
+        stroke_color=CARD_BORDER,
+        stroke_width=2.0,
+    ).move_to(np.array([3.85, -0.4, 0.0]))
+
+    card_heading = Tex(
+        r"\textbf{Árbol trivial ($n = 1$)}", color=INK_DARK, font_size=26
+    ).move_to(info_card.get_top() + 0.55 * DOWN)
+
+    step1_txt = Tex(
+        r"1. $\text{sizes}[1] = 1$, y no existen\\"
+        r"vecinos por visitar.",
+        color=INK_DARK,
+        font_size=24,
+    ).next_to(card_heading, DOWN, buff=0.38)
+
+    step2_txt = Tex(
+        r"2. Al quitar el nodo $1$, no quedan\\"
+        r"componentes conexas ($\emptyset$).",
+        color=INK_DARK,
+        font_size=24,
+    ).next_to(step1_txt, DOWN, buff=0.32)
+
+    vacuity_txt = Tex(
+        r"Por \textbf{vacuidad}, toda componente\\"
+        r"tiene tamaño $\le 0$ $\Rightarrow$ \textbf{Centroide = 1}",
+        color=TOKEN_GREEN[0],
+        font_size=24,
+    ).next_to(step2_txt, DOWN, buff=0.35)
+
+    badge = tree.create_size_badge(1, trace.sizes[1], direction=UP + RIGHT)
+
+    scene.play(
+        FadeIn(sec_title),
+        FadeIn(tree.nodes_group, scale=0.85),
+        FadeIn(badge, scale=0.85),
+        FadeIn(info_card),
+        FadeIn(card_heading),
+        FadeIn(step1_txt),
+        run_time=1.4,
+    )
+    scene.wait(2.2)
+
+    scene.play(FadeIn(step2_txt), run_time=1.0)
+    scene.wait(1.6)
+
+    halo = Circle(
+        radius=0.62,
+        color=TOKEN_GREEN[0],
+        stroke_width=2.6,
+        fill_color=TOKEN_GREEN[0],
+        fill_opacity=0.14,
+    ).move_to(positions[1]).set_z_index(0)
+
+    scene.play(
+        tree.nodes[1].recolor_anim(TOKEN_GREEN),
+        FadeIn(halo, scale=0.9),
+        Flash(tree.nodes[1], color=TOKEN_GREEN[0], line_length=0.25),
+        FadeIn(vacuity_txt, shift=0.1 * UP),
+        run_time=1.3,
+    )
+    scene.wait(3.2)
+
+    scene.play(
+        FadeOut(sec_title),
+        FadeOut(halo),
+        FadeOut(tree),
+        FadeOut(badge),
+        FadeOut(info_card),
+        FadeOut(card_heading),
+        FadeOut(step1_txt),
+        FadeOut(step2_txt),
+        FadeOut(vacuity_txt),
         run_time=0.9,
     )
+    scene.wait(0.5)
 
 
 # Complejidad temporal y créditos finales
@@ -843,16 +964,17 @@ def play_scene_4_complexity_and_credits(scene: Scene):
         font_size=24,
     ).to_edge(DOWN, buff=0.65)
 
-    scene.play(FadeIn(sec_title), Write(eq_complexity), run_time=1.6)
+    scene.play(FadeIn(sec_title), Write(eq_complexity), run_time=1.8)
+    scene.wait(2.2)
     scene.play(
         FadeIn(card_left, shift=0.1 * UP),
         FadeIn(txt_left),
         FadeIn(card_right, shift=0.1 * UP),
         FadeIn(txt_right),
         FadeIn(space_note),
-        run_time=1.4,
+        run_time=1.6,
     )
-    scene.wait(2.8)
+    scene.wait(11.2)
 
     scene.play(
         FadeOut(sec_title),
@@ -862,8 +984,9 @@ def play_scene_4_complexity_and_credits(scene: Scene):
         FadeOut(card_right),
         FadeOut(txt_right),
         FadeOut(space_note),
-        run_time=0.9,
+        run_time=1.0,
     )
+    scene.wait(0.6)
 
     credits_title = Tex(
         r"\textbf{Centroide de un Árbol}", color=INK_DARK, font_size=44
@@ -906,9 +1029,9 @@ def play_scene_4_complexity_and_credits(scene: Scene):
         FadeIn(members_card),
         FadeIn(members_txt),
         FadeIn(ref_txt),
-        run_time=1.5,
+        run_time=1.4,
     )
-    scene.wait(3.0)
+    scene.wait(3.6)
 
 
 # Parte 1 : Portada e introducción conceptual
@@ -925,11 +1048,12 @@ class Parte2(Scene):
         play_scene_2_execution(self)
 
 
-# Parte 3 : Caso borde, complejidad y créditos
+# Parte 3 : Casos borde, complejidad y créditos
 class Parte3(Scene):
     def construct(self):
         create_paper_stage(self)
         play_scene_3_star_edge_case(self)
+        play_scene_3b_single_node_edge_case(self)
         play_scene_4_complexity_and_credits(self)
 
 
@@ -940,4 +1064,5 @@ class CentroidFullVideo(Scene):
         play_scene_1_intro(self)
         play_scene_2_execution(self)
         play_scene_3_star_edge_case(self)
+        play_scene_3b_single_node_edge_case(self)
         play_scene_4_complexity_and_credits(self)
