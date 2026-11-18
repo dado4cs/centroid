@@ -293,10 +293,10 @@ def play_scene_1_intro(scene: Scene):
 
     cover_group = VGroup(title, subtitle, authors_preview).move_to(ORIGIN)
 
-    scene.play(FadeIn(title, shift=0.15 * UP), run_time=1.1)
-    scene.play(FadeIn(subtitle), FadeIn(authors_preview), run_time=1.0)
-    scene.wait(1.8)
-    scene.play(FadeOut(cover_group, shift=0.2 * UP), run_time=0.9)
+    scene.play(FadeIn(title, shift=0.15 * UP), run_time=1.4)
+    scene.play(FadeIn(subtitle), FadeIn(authors_preview), run_time=1.2)
+    scene.wait(6.4)
+    scene.play(FadeOut(cover_group, shift=0.2 * UP), run_time=1.0)
 
     sec_title = Tex(
         r"\textbf{¿Qué es el Centroide de un Árbol?}", color=INK_DARK, font_size=36
@@ -346,10 +346,11 @@ def play_scene_1_intro(scene: Scene):
         ),
         FadeIn(rule_card),
         Write(n_formula),
-        run_time=1.8,
+        run_time=2.2,
     )
-    scene.play(FadeIn(def_text), Write(ineq_formula), run_time=1.4)
-    scene.wait(1.2)
+    scene.wait(3.4)
+    scene.play(FadeIn(def_text), Write(ineq_formula), run_time=1.8)
+    scene.wait(11.6)
 
     bad_banner = Tex(
         r"Si quitamos el nodo $1$: queda un bloque de $8 > 4$ (desbalanceado)",
@@ -367,9 +368,9 @@ def play_scene_1_intro(scene: Scene):
         FadeIn(bad_comp_region),
         *[tree.nodes[i].recolor_anim(TOKEN_RED) for i in range(2, 10)],
         FadeIn(bad_banner, shift=0.1 * UP),
-        run_time=1.4,
+        run_time=1.6,
     )
-    scene.wait(1.8)
+    scene.wait(14.4)
 
     good_banner = Tex(
         r"Si quitamos el nodo $4$: componentes de tamaños $3, 3, 2 \le 4$ (\textbf{Centroide})",
@@ -394,7 +395,7 @@ def play_scene_1_intro(scene: Scene):
         tree.nodes[1].recolor_anim(TOKEN_BLUE),
         tree.edges[(1, 2)].animate.set_stroke(opacity=1.0),
         *[tree.nodes[i].recolor_anim(TOKEN_BLUE) for i in range(2, 10)],
-        run_time=0.9,
+        run_time=1.0,
     )
 
     scene.play(
@@ -406,9 +407,9 @@ def play_scene_1_intro(scene: Scene):
             *[FadeIn(reg, scale=0.96) for reg in good_comp_regions], lag_ratio=0.12
         ),
         FadeIn(good_banner, shift=0.1 * UP),
-        run_time=1.4,
+        run_time=1.6,
     )
-    scene.wait(2.2)
+    scene.wait(15.4)
 
     scene.play(
         FadeOut(sec_title),
@@ -419,7 +420,7 @@ def play_scene_1_intro(scene: Scene):
         FadeOut(def_text),
         FadeOut(ineq_formula),
         FadeOut(good_banner),
-        run_time=0.9,
+        run_time=1.0,
     )
 
 
